@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PixForge — Image Enhancer, Editor & Passport Photo Maker</title>
+  <meta name="description" content="Free, private, in-browser image studio: enhance, pro filters, crop & transform, resize/export, and country-specific passport photos. No uploads." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <div class="bg-blobs" aria-hidden="true"><span class="blob blob-1"></span><span class="blob blob-2"></span><span class="blob blob-3"></span></div>
+
+  <header class="nav">
+    <a href="#" class="logo"><span class="logo-mark">◆</span> Pix<span class="accent">Forge</span></a>
+    <nav class="nav-links">
+      <a href="#" id="nav-new" hidden>New image</a>
+      <a href="https://github.com/aashishbharti04/pixforge" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- landing -->
+    <section class="hero" id="hero">
+      <h1>Your free <span class="grad">image studio</span>.</h1>
+      <p class="sub">Enhance, apply pro filters, crop & transform, resize, and make
+        country-perfect <b>passport photos</b> — all in your browser. Nothing is uploaded.</p>
+      <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="Upload an image">
+        <input id="file-input" type="file" accept="image/*" hidden />
+        <div class="dz-icon">🖼️</div>
+        <p class="dz-title">Drop an image here, or <span class="accent">browse</span></p>
+        <p class="dz-hint">or paste from clipboard · PNG, JPG, WEBP</p>
+        <div class="dz-btns">
+          <button class="btn btn-primary" id="browse-btn" type="button">Upload Image</button>
+          <button class="btn btn-ghost" id="sample-btn" type="button">Try a sample</button>
+        </div>
+      </div>
+      <div class="feature-pills">
+        <span>✨ Auto-enhance</span><span>🎨 Pro filters</span><span>🎚️ Adjustments</span>
+        <span>✂️ Crop & rotate</span><span>🪪 Passport photos</span><span>📐 Resize & export</span>
+      </div>
+    </section>
+
+    <!-- editor -->
+    <section class="editor" id="editor" hidden>
+      <div class="stage">
+        <div class="canvas-host" id="canvas-host">
+          <canvas id="view"></canvas>
+          <!-- crop / passport overlay -->
+          <div id="crop-overlay" class="crop-overlay" hidden></div>
+        </div>
+      </div>
+
+      <aside class="panel-wrap">
+        <div class="tabs" id="tabs">
+          <button class="tab active" data-tab="adjust" type="button">Adjust</button>
+          <button class="tab" data-tab="filters" type="button">Filters</button>
+          <button class="tab" data-tab="transform" type="button">Transform</button>
+          <button class="tab" data-tab="passport" type="button">Passport</button>
+          <button class="tab" data-tab="export" type="button">Export</button>
+        </div>
+
+        <!-- ADJUST -->
+        <div class="panel" data-panel="adjust">
+          <button class="btn btn-primary full" id="auto-enhance">✨ Auto-enhance</button>
+          <div id="sliders"></div>
+          <button class="btn btn-ghost full" id="reset-adjust">Reset adjustments</button>
+        </div>
+
+        <!-- FILTERS -->
+        <div class="panel" data-panel="filters" hidden>
+          <div class="filter-grid" id="filter-grid"></div>
+        </div>
+
+        <!-- TRANSFORM -->
+        <div class="panel" data-panel="transform" hidden>
+          <div class="btn-row">
+            <button class="btn btn-ghost" data-act="rot-left" type="button">↺ Rotate</button>
+            <button class="btn btn-ghost" data-act="rot-right" type="button">↻ Rotate</button>
+            <button class="btn btn-ghost" data-act="flip-h" type="button">⇋ Flip H</button>
+            <button class="btn btn-ghost" data-act="flip-v" type="button">⇅ Flip V</button>
+          </div>
+          <label class="field">Crop aspect
+            <select id="crop-aspect">
+              <option value="free">Free</option>
+              <option value="1">1:1 Square</option>
+              <option value="1.333">4:3</option>
+              <option value="0.75">3:4</option>
+              <option value="1.777">16:9</option>
+              <option value="0.5625">9:16</option>
+            </select>
+          </label>
+          <div class="btn-row">
+            <button class="btn btn-primary" id="crop-apply" type="button">Apply crop</button>
+            <button class="btn btn-ghost" id="crop-cancel" type="button">Cancel</button>
+          </div>
+          <p class="hint">Toggle a crop aspect, drag the box on the image, then Apply.</p>
+        </div>
+
+        <!-- PASSPORT -->
+        <div class="panel" data-panel="passport" hidden>
+          <label class="field">Country / size
+            <select id="passport-country"></select>
+          </label>
+          <p class="hint" id="passport-spec"></p>
+          <label class="field">Zoom <input type="range" id="passport-zoom" min="1" max="3" step="0.01" value="1" /></label>
+          <label class="field">Background
+            <select id="passport-bg">
+              <option value="keep">Keep original</option>
+              <option value="#ffffff">White</option>
+              <option value="#f2f2f2">Light grey</option>
+              <option value="#dbeafe">Light blue</option>
+            </select>
+          </label>
+          <p class="hint">Drag the photo to position the face inside the frame.</p>
+          <div class="btn-row">
+            <button class="btn btn-primary" id="passport-download" type="button">⬇ Photo</button>
+            <button class="btn btn-primary" id="passport-sheet" type="button">⬇ 4×6 print sheet</button>
+          </div>
+        </div>
+
+        <!-- EXPORT -->
+        <div class="panel" data-panel="export" hidden>
+          <label class="field">Resize (max width px)
+            <input type="number" id="export-width" min="16" placeholder="original" />
+          </label>
+          <label class="field">Format
+            <select id="export-format">
+              <option value="image/png">PNG</option>
+              <option value="image/jpeg">JPG</option>
+              <option value="image/webp">WEBP</option>
+            </select>
+          </label>
+          <label class="field">Quality <input type="range" id="export-quality" min="0.4" max="1" step="0.01" value="0.92" /></label>
+          <button class="btn btn-primary full" id="export-download">⬇ Download image</button>
+          <p class="hint" id="export-info"></p>
+        </div>
+
+        <div class="panel-actions">
+          <button class="btn btn-ghost" id="reset-all" type="button">↺ Revert all</button>
+          <button class="btn btn-ghost" id="new-image" type="button">New image</button>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <nav class="socials" id="socials" aria-label="Social links"></nav>
+    <p class="footer-text">Built with <a href="https://github.com/aashishbharti04/pixforge" target="_blank" rel="noopener">PixForge</a> · 100% in-browser · © <span id="year"></span> Aashish Bharti</p>
+  </footer>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
