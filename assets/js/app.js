@@ -344,6 +344,7 @@ function initEditorControls() {
   $("passport-download").addEventListener("click", downloadPassport);
   $("passport-sheet").addEventListener("click", downloadSheet);
   $("export-download").addEventListener("click", exportImage);
+  $("quick-download").addEventListener("click", exportImage);
   $("reset-all").addEventListener("click", revertAll);
   $("new-image").addEventListener("click", newImage);
   $("nav-new").addEventListener("click", (e) => { e.preventDefault(); newImage(); });
